@@ -7,17 +7,13 @@ if (typeof Object.create !== 'function') {
 }
 
 Function.prototype.method = function(name, func) {
-	this.prototype[name] = func;
-	return this;
+	if (!this.prototype[name]) {
+		this.prototype[name] = func;
+		return this;
+	}
 }
 
 document.writeln("Hello, world!");
-
-document.writeln(foo());
-
-foo = function() {
-	return "bar";
-}
 
 // Create myObject. It has a value and an increment
 // method. The increment method takes an optional
@@ -39,7 +35,13 @@ document.writeln(myObject.value);
 
 // Augment myObject with a double method
 
-function add(x, y) {
+var add = function(x, y) {
+	if (typeof x !== 'number' || typeof y !== 'number') {
+		throw {
+			name: 'TypeError',
+			message: 'add needs numbers'
+		}
+	}
 	return x + y;
 }
 
@@ -111,3 +113,54 @@ var sum2 = function () {
 };
 
 document.writeln(sum2(4,8,15,16,23,42)); // 108
+
+// Make a try_it function that calls the new add
+// function incorrectly.
+
+var try_it = function() {
+	try {
+		add("seven");
+	} catch(e) {
+		document.writeln(e.name + ': ' + e.message);
+	}
+};
+
+try_it();
+
+Number.method('integer', function() {
+	return Math[this < 0 ? 'ceil' : 'floor'](this);
+});
+
+document.writeln((-10/3).integer());
+
+String.method('trim', function() {
+	return this.replace(/^\s+|\s+$/g, '');
+});
+
+document.writeln('"'+"     neat      ".trim()+'"');
+
+var hanoi = function hanoi(disc, src, aux, dst) {
+	if (disc > 0) {
+		hanoi(disc - 1, src, dst, aux);
+		document.writeln('Move disc ' + disc + ' from ' + src + ' to ' + dst);
+		hanoi(disc - 1, aux, src, dst);
+	}
+};
+
+hanoi(3, 'Src', 'Aux', 'Dst');
+
+// Define a walk_the_DOM function that visits every
+// node of the tree in HTML source order, starting
+// from some given node. It invokes a function,
+// passing it each node in turn, walk_the_DOM calls
+// itself to process each of the child nodes.
+
+var walk_the_DOM = function walk(node, func) {
+	func(node);
+	node = node.firstChild;
+	while(node) {
+		walk(node, func);
+		node = node.nextSibling;
+	}
+};
+
