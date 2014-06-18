@@ -164,3 +164,38 @@ var walk_the_DOM = function walk(node, func) {
 	}
 };
 
+// Define a getElementsByAttribute function. It
+// takes an attribute name string and an optional
+// matching value. It calls walk_the_DOM, passing it aLinkcolor
+// function that looks for an attribute name in the
+// node. The matching nodes are accumulated in a 
+// results array.
+
+var getElementsByAttribute = function(att, value) {
+	var results = [];
+	
+	walk_the_DOM(document.body, function(node) {
+		var actual = node.nodeType === 1 && node.getAttribute(att);
+		if (typeof actual === 'string' && (actual === value || typeof value !== 'string')) {
+			results.push(node);
+		}
+	});
+	
+	return results;
+};
+
+// Make a factorial function with tail
+// recursion. It is tail recursive because
+// it returns the result of calling itself.
+
+// JavaScript does not currently optimize this form.
+
+var factorial = function(i, a) {
+	a = a || 1;
+	if (i < 2) {
+		return a;
+	}
+	return factorial(i - 1, a * i);
+};
+
+document.writeln(factorial(4));
