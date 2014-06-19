@@ -199,3 +199,126 @@ var factorial = function(i, a) {
 };
 
 document.writeln(factorial(4));
+
+// Crate a maker function called quo. It makes an
+// object with a get_status method and a private
+// status property.
+
+var quo = function(status) {
+	return {
+		get_status: function() {
+			return status;
+		}
+	};
+};
+
+// Make an instance of quo.
+
+var myQuo = quo("amazed");
+document.writeln(myQuo.get_status());
+
+// Define a function that sets a DOM node's color
+// to yellow and then fades it to white.
+
+var fade = function(node) {
+	var level = 1;
+	var step = function() {
+		var hex = level.toString(16);
+		node.style.backgroundColor = '#FFFF' + hex + hex;
+		if (level < 15) {
+			level += 1;
+			setTimeout(step, 100);
+		}
+	};
+	setTimeout(step, 100);
+};
+
+fade(document.body);
+
+
+String.method('deentitify', function() {
+	var entity = {
+		quot: '"',
+		lt: '<',
+		gt: '>'
+	};
+	return function() {
+		return this.replace(/&([^&;]+);/g,
+			function(a, b) {
+				var r = entity[b];
+				return typeof r === 'string' ? r : a;
+			}
+		);
+	};
+}());
+
+document.writeln('&lt;&quot;&gt;'.deentitify());
+
+var serial_maker = function() {
+	var prefix = '';
+	var seq = 0;
+	return {
+		set_prefix: function(p) {
+			prefix = String(p);
+		},
+		set_seq: function(s) {
+			seq = s;
+		},
+		gensym: function() {
+			var result = prefix + seq;
+			seq += 1;
+			return result;
+		}
+	};
+};
+
+var seqer = serial_maker();
+seqer.set_prefix('Q');
+seqer.set_seq(1000);
+var unique = seqer.gensym();
+
+Function.method('curry', function() {
+	var slice = Array.prototype.slice,
+		args = slice.apply(arguments),
+		that = this;
+	return function() {
+		return that.apply(null, args.concat(slice.apply(arguments)));
+	};
+});
+
+// var fibonacci = function(n) {
+// 	return n < 2 ? n : fibonacci(n - 1) + fibonacci(n - 2);
+// };
+
+// var fibonacci = (function() {
+// 	var memo = [0,1];
+// 	var fib = function(n) {
+// 		var result = memo[n];
+// 		if (typeof result !== 'number') {
+// 			result = fib(n-1) + fib(n-2);
+// 			memo[n] = result;
+// 		}
+// 		return result;
+// 	};
+// 	return fib;
+// }());
+
+var memoizer = function(memo, formula) {
+	var recur = function(n) {
+		var result = memo[n];
+		if(typeof result !== 'number') {
+			result = formula(recur, n);
+			memo[n] = result;
+		}
+		return result;
+	};
+	return recur;
+};
+
+var fibonacci = memoizer([0,1], function(recur, n) {
+	return recur(n-1) + recur(n-2);
+});
+
+for (var i = 0; i <= 10; i++) {
+	document.writeln('// ' + i + ': ' + fibonacci(i));
+}
