@@ -322,3 +322,7 @@ var fibonacci = memoizer([0,1], function(recur, n) {
 for (var i = 0; i <= 10; i++) {
 	document.writeln('// ' + i + ': ' + fibonacci(i));
 }
+
+var factorial2 = memoizer([1,1], function(recur, n) {
+	return n * recur(n-1);
+};
